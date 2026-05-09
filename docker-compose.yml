@@ -1,0 +1,41 @@
+services:
+  server:
+    build:
+      context: ./code
+      dockerfile: server/Dockerfile
+    container_name: dmscraper-server
+    env_file: .env
+    environment:
+      - DB_PATH=/data/data.db
+    volumes:
+      - ./data:/data
+    restart: unless-stopped
+
+  client:
+    build:
+      context: ./code
+      dockerfile: client/Dockerfile
+    container_name: dmscraper-client
+    env_file: .env
+    environment:
+      - DB_PATH=/data/data.db
+      - SERVER_WS_HOST=server
+    volumes:
+      - ./data:/data
+    depends_on:
+      - server
+    restart: unless-stopped
+
+  admin:
+    build:
+      context: ./code
+      dockerfile: admin/Dockerfile
+    container_name: dmscraper-admin
+    env_file: .env
+    environment:
+      - DB_PATH=/data/data.db
+    ports:
+      - "6767:6767"
+    volumes:
+      - ./data:/data
+    restart: unless-stopped
